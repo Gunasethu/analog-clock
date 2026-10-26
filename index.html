@@ -18,6 +18,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .seg button{border:0;background:none;padding:5px 14px;border-radius:999px;font:inherit;color:var(--mute);cursor:pointer}
 .seg button.on{background:var(--ink);color:#fff}
 #snd,.tg{border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;padding:0}
+.fs{display:flex;align-items:center;gap:8px}
+.fs select{font:inherit;color:var(--ink);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23161616' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 11px center;border:1px solid var(--line);border-radius:999px;padding:5px 30px 5px 12px;-webkit-appearance:none;appearance:none;cursor:pointer}
+.fs select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .tools{display:flex;align-items:center;gap:22px}
 .tg{display:flex;align-items:center;gap:8px}
 .pill{width:26px;height:15px;border-radius:999px;background:#d6d6d6;position:relative;transition:background .15s}
@@ -25,6 +28,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .tg[aria-pressed=true] .pill{background:var(--ink)}
 .tg[aria-pressed=true] .pill::after{transform:translateX(11px)}
 #clock{width:min(83vh,92vw,700px);aspect-ratio:1;flex:none;display:block;touch-action:none;overflow:visible}
+#clock.dark .lt,#clock:not(.dark) .dk{display:none}
 .task{cursor:pointer}
 .task .vis{transition:stroke-width .18s ease}
 .task.hot,.task.sel{opacity:1!important}
@@ -66,7 +70,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 <body>
 <div class="bar">
   <div class="seg"><button id="am">AM</button><button id="pm">PM</button></div>
-  <div class="tools"><button id="lbl" class="tg" aria-pressed="false">Show labels<span class="pill"></span></button><button id="snd">Sound off</button></div>
+  <div class="tools"><label class="fs">Clock face<select id="faceSel" autocomplete="off"><option value="classic">Classic</option><option value="chrono">Chronograph</option></select></label><button id="lbl" class="tg" aria-pressed="false">Expand tasks<span class="pill"></span></button><button id="snd">Sound off</button></div>
 </div>
 
 <svg id="clock" viewBox="-30 -30 700 700" aria-label="Analog clock with day tasks">
@@ -83,7 +87,20 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
     <linearGradient id="rimEdge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
     <linearGradient id="innerSh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".24"/><stop offset=".55" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
     <clipPath id="faceClip"><circle cx="320" cy="320" r="250"/></clipPath>
+    <filter id="shd" x="-30%" y="-30%" width="160%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow in="SourceGraphic" dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity=".35" result="c"/>
+      <feDropShadow in="SourceGraphic" dx="0" dy="24" stdDeviation="22" flood-color="#000" flood-opacity=".32" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="c"/></feMerge>
+    </filter>
+    <filter id="lift" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#000" flood-opacity=".7"/></filter>
+    <filter id="hs" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity=".6"/></filter>
+    <linearGradient id="dRimA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5c5c5c"/><stop offset=".35" stop-color="#1c1c1c"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <linearGradient id="dRimB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#3e3e3e"/></linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".1"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="sdG"><stop offset="0" stop-color="#202020"/><stop offset="1" stop-color="#121212"/></radialGradient>
+    <radialGradient id="grG"><stop offset="0" stop-color="#37824f"/><stop offset="1" stop-color="#245a38"/></radialGradient>
   </defs>
+  <g class="lt">
   <circle cx="320" cy="320" r="259" fill="url(#rimA)" filter="url(#sh)"/>
   <circle cx="320" cy="320" r="258.5" fill="none" stroke="url(#rimEdge)" stroke-width="1"/>
   <circle cx="320" cy="320" r="254" fill="url(#rimB)"/>
@@ -93,16 +110,35 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   <text class="lbl" x="320" y="250" style="font-size:9.5px">INDIA STANDARD TIME</text>
   <rect x="380" y="310" width="56" height="20" rx="6" fill="#fff" stroke="#ddd"/>
   <text id="date" x="408" y="320" class="lbl" style="font-size:9.5px;font-weight:600;letter-spacing:.08em;dominant-baseline:central"></text>
+  </g>
+  <g class="dk">
+    <circle cx="320" cy="320" r="259" fill="url(#dRimA)" filter="url(#shd)"/>
+    <circle cx="320" cy="320" r="258.5" fill="none" stroke="url(#rimEdge)" stroke-width="1.2"/>
+    <circle cx="320" cy="320" r="254" fill="url(#dRimB)"/>
+    <circle cx="320" cy="320" r="250" fill="#0b0b0b"/>
+    <g id="dface"></g>
+    <circle cx="320" cy="320" r="250" fill="url(#sheen)" pointer-events="none"/>
+  </g>
   <g id="tasks"></g>
   <g id="hint">
     <path id="prev" fill="none" stroke="#e3e3e3" stroke-width="10" stroke-linecap="round" opacity="0"/>
     <path id="prev2" fill="none" stroke="#8c8c8c" stroke-width="2" stroke-dasharray="5 4" opacity="0"/>
     <line id="hdot" stroke="#161616" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
   </g>
+  <g class="lt">
   <g id="hh"><line x1="320" y1="320" x2="320" y2="184" stroke="#161616" stroke-width="7" stroke-linecap="round"/></g>
   <g id="mh"><line x1="320" y1="320" x2="320" y2="125" stroke="#161616" stroke-width="4.5" stroke-linecap="round"/></g>
   <g id="sh2"><line x1="320" y1="320" x2="320" y2="103" stroke="#b3261e" stroke-width="1.3"/><circle cx="320" cy="339" r="4" fill="#b3261e"/></g>
   <circle cx="320" cy="320" r="8" fill="#fff" stroke="#b3261e" stroke-width="3"/>
+  </g>
+  <g class="dk">
+    <g filter="url(#hs)">
+      <g id="dhh"><path transform="translate(320 320)" d="M-5 20L-3.2 -112L3.2 -112L5 20Z" fill="#f6f6f6"/></g>
+      <g id="dmh"><path transform="translate(320 320)" d="M-4.5 22L-2.4 -200L2.4 -200L4.5 22Z" fill="#cfcfcf"/></g>
+    </g>
+    <circle cx="320" cy="320" r="15" fill="#141414" stroke="#3c3c3c" stroke-width="2"/>
+    <circle cx="320" cy="320" r="3.5" fill="#9a9a9a"/>
+  </g>
 </svg>
 <div id="read"></div>
 <div id="next"></div>
@@ -125,7 +161,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 </div>
 
 <script>
-const $=s=>document.querySelector(s),NS='http://www.w3.org/2000/svg',C=320,R=250,BASE=266,ZONE=[205,330];
+const $=s=>document.querySelector(s),NS='http://www.w3.org/2000/svg',C=320,R=250,BASE=272,ZONE=[205,330];
 const COLORS=['#4361ee','#43a047','#d97706','#e11d48','#8b5cf6','#0ea5e9'];
 const el=(n,a,p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
 const pol=(r,a)=>[C+r*Math.sin(a*Math.PI/180),C-r*Math.cos(a*Math.PI/180)];
@@ -166,7 +202,7 @@ let hotId=null,arcs=[]; /* arcs: geometry of drawn tasks, used to find the task 
 const arcD=(m0,m1,r)=>{const a0=m0/2,a1=Math.min(m1/2,a0+359.99),[x0,y0]=pol(r,a0),[x1,y1]=pol(r,a1);return `M${x0} ${y0}A${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1} ${y1}`};
 
 function render(){
-  const base=half*720,nm=now.h*60+now.m,lanes=[],L={},LS=labelsOn?26:17,gap=labelsOn?12:0; /* gap: minutes kept free between neighbours in a lane, so round caps don't touch */
+  const base=half*720,nm=now.h*60+now.m,lanes=[],L={},LS=26,gap=labelsOn?12:0; /* gap: minutes kept free between neighbours in a lane, so round caps don't touch */
   const vis=tasks.filter(t=>t.end>base&&t.start<base+720).sort((a,b)=>a.start-b.start);
   const seg=t=>{const a=t.start%720,b=a+Math.min(t.end-t.start,719);return b>720?[[a,720],[0,b-720]]:[[a,b]]}; /* dial segments a task covers */
   vis.forEach(t=>{const sg=seg(t);let i=lanes.findIndex(ln=>ln.every(x=>sg.every(y=>y[0]>=x[1]+gap||y[1]+gap<=x[0])));if(i<0){i=lanes.length;lanes.push([])}lanes[i].push(...sg);L[t.id]=i});
@@ -175,9 +211,10 @@ function render(){
     const r=BASE+L[t.id]*LS,m0=t.start%720,m1=m0+Math.min(t.end-t.start,719.99),d=arcD(m0,m1,r);arcs.push({id:t.id,r,a0:m0/2,a1:m1/2});
     const g=el('g',{class:'task'+(sel===t.id?' sel':'')+(labelsOn?' show':'')+(hotId===t.id?' hot':''),'data-id':t.id,role:'button','aria-label':`${ttl(t)}, ${tm(t.start)} to ${tm(t.end)}`},tasksG),live=nm>=t.start&&nm<t.end;
     g.style.opacity=t.end<=nm?(labelsOn?.55:.4):1;
-    el('path',{d,fill:'none',stroke:'transparent','stroke-width':LS,'stroke-linecap':'round'},g);
-    el('path',{d,class:'vis',fill:'none',stroke:t.color,'stroke-width':live?9:6,'stroke-linecap':'round'},g);
-    label(g,t,r,m0,m1);
+    const tf=el('g',{class:'tf'},g);
+    el('path',{d,class:'vis',fill:'none',stroke:t.color,'stroke-width':live?9:6,'stroke-linecap':'round'},tf);
+    label(tf,t,r,m0,m1);
+    g.dataset.r=r;g.dataset.live=live?1:0;setTf(g);
   });
   $('#am').classList.toggle('on',half===0);$('#pm').classList.toggle('on',half===1);
   renderNext();
@@ -213,19 +250,24 @@ const A=p=>{const a=Math.atan2(p[0],-p[1])*180/Math.PI;return a<0?a+360:a};
 /* Finds the task nearest the pointer. Generous on purpose: about 16px either side of the line and 8px past its ends,
    so a task can be hovered or clicked without aiming at the thin line. Starting a drag further in (inside the clock edge) still creates. */
 function pick(p){
-  const rho=Math.hypot(p[0],p[1]),th=A(p),tol=(labelsOn?26:17)/2+8;
+  const rho=Math.hypot(p[0],p[1]),th=A(p);
   let best=null,bs=1e9;
   for(const a of arcs){
-    const dr=Math.abs(rho-a.r);if(dr>tol)continue;
+    const sd=rho-a.r;if(sd<-9||sd>24)continue;const dr=Math.abs(sd);
     const span=a.a1-a.a0,off=((th-a.a0)%360+360)%360,da=off<=span?0:Math.min(off-span,360-off),dt=da*Math.PI/180*rho;
-    if(dt>8)continue;
+    if(dt>12)continue;
     const sc=Math.hypot(dr,dt);if(sc<bs){bs=sc;best=a}
   }
   return best;
 }
+/* An enlarged line grows outward only: scale it about the clock centre so its inner edge stays where the thin line's was. */
+function setTf(g){
+  const r=+g.dataset.r,c=g.classList,w=c.contains('hot')||c.contains('sel')?26:c.contains('show')?22:+g.dataset.live?9:6,k=(r+(w-6)/2)/r;
+  g.querySelector('.tf').setAttribute('transform',`matrix(${k} 0 0 ${k} ${C*(1-k)} ${C*(1-k)})`);
+}
 function setHot(id){
   if(id===hotId)return;hotId=id;
-  tasksG.querySelectorAll('.task').forEach(g=>g.classList.toggle('hot',g.dataset.id===id));
+  tasksG.querySelectorAll('.task').forEach(g=>{g.classList.toggle('hot',g.dataset.id===id);setTf(g)});
 }
 const inZone=p=>{const d=Math.hypot(p[0],p[1]);return d>=ZONE[0]&&d<=ZONE[1]};
 const showTip=(e,t)=>{tip.hidden=false;tip.textContent=t;tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY+14+'px'};
@@ -339,6 +381,55 @@ function stepSound(m){
   o.connect(out);out.connect(ctx.destination);o.start(t);o.stop(t+.1);
 }
 
+/* ---------- second style: dark watch face (reference: Paul Smith chronograph) ---------- */
+const SD={L:[C-77,C-44.5],R:[C+77,C-44.5],B:[C,C+89]}; /* centres of the three sub-dials */
+const pc=(cx,cy,r,a)=>[cx+r*Math.sin(a*Math.PI/180),cy-r*Math.cos(a*Math.PI/180)];
+const ln=(p,cx,cy,r1,r2,a,o)=>{const[x1,y1]=pc(cx,cy,r1,a),[x2,y2]=pc(cx,cy,r2,a);return el('line',Object.assign({x1,y1,x2,y2},o),p)};
+const tx=(p,x,y,str,o,rt)=>{const t=el('text',Object.assign({x,y,'text-anchor':'middle','dominant-baseline':'central',fill:'#fff'},o),p);t.textContent=str;if(rt)t.setAttribute('transform',`rotate(${rt} ${x} ${y})`);return t};
+const rot2=(id,a,c)=>$(id).setAttribute('transform',`rotate(${a} ${c[0]} ${c[1]})`);
+function buildDark(){
+  const dk=$('#dface');
+  el('circle',{cx:C,cy:C,r:194,fill:'#101010',stroke:'#2a2a2a','stroke-width':1.5},dk);
+  for(let i=0;i<60;i++)if(i%5)ln(dk,C,C,238,245,i*6,{stroke:'#9a9a9a','stroke-width':1.4});
+  for(let k=0;k<12;k++){ /* 12 sectors: big numerals at 12/3/6/9, small minute numbers between */
+    const a=k*30,big=k%3===0;
+    ln(dk,C,C,196,246,a+15,{stroke:'#3a3a3a','stroke-width':1.2});
+    el('path',{d:`M${C-6} ${C-236}L${C+6} ${C-236}L${C} ${C-225}Z`,transform:`rotate(${a} ${C} ${C})`,fill:big?'#fff':'none',stroke:'#fff','stroke-width':big?0:1.2,'stroke-opacity':.85},dk);
+    const [x,y]=pc(C,C,big?205:211,a);
+    tx(dk,x,y,big?(k||12):pad(k*5),big?{'font-size':30,'font-weight':700}:{'font-size':15,'font-weight':600,fill:'#e8e8e8'},big?0:(a>90&&a<270?a+180:a));
+  }
+  tx(dk,C,C-150,'INDIA STANDARD TIME',{'font-size':9.5,'letter-spacing':'.2em',fill:'#bdbdbd'});
+  [['L',200,355],['R',5,160],['B',100,260]].forEach(([id,s0,e0])=>{ /* sub-dials: seconds+minutes, 24-hour, task countdown */
+    const [cx,cy]=SD[id],[x0,y0]=pc(cx,cy,79,s0),[x1,y1]=pc(cx,cy,79,e0);
+    el('path',{d:`M${x0} ${y0}A79 79 0 ${e0-s0>180?1:0} 1 ${x1} ${y1}`,fill:'none',stroke:'#d9501f','stroke-width':1.8},dk);
+    el('circle',{cx,cy,r:72,fill:'url(#sdG)',stroke:'#2e2e2e','stroke-width':1.5},dk);
+    const n=id==='R'?24:60;
+    for(let i=0;i<n;i++){const major=id==='R'?i%6===0:i%5===0;ln(dk,cx,cy,major?58:63,68,i*360/n,{stroke:'#d8d8d8','stroke-width':major?2:1})}
+    (id==='R'?[12,18,24,6]:[0,10,20,30,40,50]).forEach((v,i,arr)=>{const [x,y]=pc(cx,cy,46,i*360/arr.length);tx(dk,x,y,v,{'font-size':12,'font-weight':600})});
+  });
+  el('path',{d:`M${C-14} ${C-129}L${C+14} ${C-129}L${C} ${C-74}Z`,fill:'#f2b93b'},dk);
+  /* sub-dial hands sit under the green disc, as on the reference */
+  const hand=(id,c,len,tail,col,w)=>{const g=el('g',{id},dk);el('line',{x1:c[0],y1:c[1]+tail,x2:c[0],y2:c[1]-len,stroke:col,'stroke-width':w},g)};
+  hand('sdS',SD.L,62,12,'#e0401a',1.6);hand('sdM',SD.L,60,0,'#2147c4',5);hand('sd24',SD.R,56,10,'#f4f4f4',4);hand('sdC',SD.B,58,10,'#e0401a',3);
+  Object.values(SD).forEach(c=>{el('circle',{cx:c[0],cy:c[1],r:7.5,fill:'#f4f4f4'},dk);el('circle',{cx:c[0],cy:c[1],r:3,fill:'#0a0a0a'},dk)});
+  const gd=el('g',{filter:'url(#lift)'},dk); /* raised green disc */
+  el('circle',{cx:C,cy:C,r:70,fill:'url(#grG)'},gd);
+  for(let i=0;i<60;i++)ln(gd,C,C,i%5?64:60,68,-i*6,{stroke:'#fff','stroke-width':i%5?1:1.8,'stroke-opacity':.9});
+  for(let k=0;k<6;k++){
+    ln(gd,C,C,31,68,30+k*60,{stroke:'#fff','stroke-width':1.6,'stroke-opacity':.9});
+    const a=-k*60,[x,y]=pc(C,C,48,a);tx(gd,x,y,k*10,{'font-size':21,'font-weight':700},a);
+  }
+  el('circle',{cx:C,cy:C,r:31,fill:'#060606',stroke:'#1c1c1c','stroke-width':2},gd);
+  const dp=el('g',{transform:`translate(${C+116} ${C+68}) rotate(24)`},dk); /* date pill */
+  el('rect',{x:-21,y:-14,width:42,height:28,rx:14,fill:'#161616',stroke:'#3a3a3a','stroke-width':1.2},dp);
+  el('rect',{x:-18,y:-11,width:36,height:22,rx:11,fill:'#ececec'},dp);
+  tx(dp,0,1,'',{'font-size':16,'font-weight':700,fill:'#161616'}).id='ddate';
+}
+buildDark();
+let dark=false; /* Classic (the first option) is always the default */
+$('#faceSel').value='classic';
+$('#faceSel').onchange=e=>{dark=e.target.value==='chrono';svg.classList.toggle('dark',dark)};
+
 /* clock loop */
 let lastSec=-1,lastMin=-1;
 const rot=(id,a)=>$(id).setAttribute('transform',`rotate(${a} ${C} ${C})`);
@@ -347,13 +438,19 @@ function frame(){
   if(sec!==lastSec){
     lastSec=sec;now=ist();
     $('#read').textContent=`${pad(now.h)}:${pad(now.m)}:${pad(now.s)} IST`;
-    $('#date').textContent=`${now.wd} ${now.d}`;
+    $('#date').textContent=`${now.wd} ${now.d}`;$('#ddate').textContent=now.d;
     if(now.key!==key){key=now.key;load();sel=null;card.hidden=true}
     if(now.m!==lastMin){lastMin=now.m;render()}else renderNext();
     tick();
   }
   const s=now.s+(ms%1000)/1000;
   rot('#sh2',s*6);rot('#mh',(now.m+s/60)*6);rot('#hh',(now.h%12+now.m/60+s/3600)*30);
+  if(dark){
+    rot('#dmh',(now.m+s/60)*6);rot('#dhh',(now.h%12+now.m/60+s/3600)*30);
+    rot2('#sdS',s*6,SD.L);rot2('#sdM',(now.m+s/60)*6,SD.L);rot2('#sd24',(now.h+now.m/60+s/3600-12)/24*360,SD.R);
+    const nm=now.h*60+now.m,lv=tasks.find(t=>nm>=t.start&&nm<t.end);
+    rot2('#sdC',lv?Math.min(60,lv.end-nm-s/60)*6:0,SD.B); /* minutes left in the current task */
+  }
   requestAnimationFrame(frame);
 }
 render();frame();
